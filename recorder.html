@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Quicksand', sans-serif;
+        }
+
+        #container {
+            max-width: 450px;
+            background-color: #FF6666;
+            color: white;
+            padding: 2pc 3pc;
+            margin: 2pc auto;
+            box-shadow: -20px -20px 0 0 rgba(100, 100, 100, .1);
+        }
+
+        #container h1 {
+            font-size: 2.6rem;
+            font-weight: normal;
+            letter-spacing: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, .3);
+            margin: 5px 0;
+        }
+
+        #container span {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        #input {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        #input input {
+            height: 50px;
+            border: none;
+            padding: 0 1pc;
+            outline: none;
+            flex-grow: 1;
+            background-color: rgba(255, 255, 255, .7);
+        }
+
+        #input button {
+            height: 50px;
+            padding: 0 1pc;
+            color: white;
+            background-color: rgba(255, 160, 160, .3);
+            border: 1px solid #eee;
+            margin-left: 5px;
+            cursor: pointer;
+            transition: background .2s ease-out;
+            outline: none;
+        }
+
+        #input button:hover {
+            background-color: #FF6666;
+        }
+    </style>
+</head>
+<body>
+<script src="js/vue.min.js"></script>
+
+<div id="container">
+    <h1>事项清单<span>把事情完成，每次一个项目。</span></h1>
+
+    <form id="input" v-on:submit.prevent="addItem">
+        <input type="text" placeholder="添加事项" v-model="newItem">
+        <button type="submit">Execute</button>
+    </form>
+
+    <div id="list">
+        <togglebutton
+                label="在最后移动完成的项目？"
+                name="todosort"
+                v-on:clicked="toggle"/>
+    </div>
+
+    <script>
+        const list = new Vue({
+            el: '#list',
+            data: {
+                newItem: '',
+                sortByStatus: false,
+                todo: [
+                    {label: "Learn VueJs", done: true},
+                    {label: "Code a todo list", done: false},
+                    {label: "Learn something else", done: false}
+                ]
+            },
+            methods: {
+                addItem: function () {
+                    this.todo.push({label: this.newItem, done: false});
+                    alert(this.newItem);
+                    this.newItem = '';
+                },
+                markAsDoneOrUndone: function (item) {
+                    item.done = !item.done;
+                },
+                deleteItemFromList: function (item) {
+                    let index = this.todo.indexOf(item);
+                    this.todo.splice(index, 1);
+                },
+                toggle: function (active) {
+                    this.sortByStatus = active;
+                }
+            },
+            computed: {
+                todoByStatus: function () {
+                    if (!this.sortByStatus) {
+                        return this.todo;
+                    }
+
+                    let sortedArray = [];
+                    const doneArray = this.todo.filter(function (item) {
+                        return item.done;
+                    });
+                    const notDoneArray = this.todo.filter(function (item) {
+                        return !item.done;
+                    });
+
+                    sortedArray = [...notDoneArray, ...doneArray];
+                    return sortedArray;
+                }
+            }
+        });
+    </script>
+</div>
+</body>
+</html>
