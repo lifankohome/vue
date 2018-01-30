@@ -1,2 +1,2 @@
-# vue
-vue.js
+# Vue
+Vue.js 网络记事本

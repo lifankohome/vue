@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-if="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -26,7 +27,7 @@
             margin: 5px 0;
         }
 
-        #container span {
+        #container h1 span {
             display: block;
             font-size: 14px;
             margin-bottom: 5px;
@@ -61,6 +62,62 @@
         #input button:hover {
             background-color: #FF6666;
         }
+
+        .list ul {
+            margin-top: 1pc;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .list li {
+            display: flex;
+            margin: .5pc 0;
+            padding: 1pc .5pc 1pc 2pc;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .list .label {
+            position: relative;
+            transition: opacity .2s linear;
+        }
+
+        .list .done .label {
+            opacity: .6;
+        }
+
+        @keyframes strikeitem {
+            to {
+                width: calc(100% + 1pc);
+            }
+        }
+
+        .list .done .label:before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -0.5pc;
+            display: block;
+            width: 0;
+            height: 1px;
+            background: #FFF;
+            animation: strikeitem .3s ease-out 0s forwards;
+        }
+
+        .actions span {
+            font-size: 12px;
+            cursor: alias;
+        }
+
+        .actions span:first-child {
+
+        }
+
+        .actions span:last-child {
+            padding: 2px 5px;
+            border-radius: 2px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -74,19 +131,25 @@
         <button type="submit">Execute</button>
     </form>
 
-    <div id="list">
-        <togglebutton
-                label="在最后移动完成的项目？"
-                name="todosort"
-                v-on:clicked="toggle"/>
+    <div class="list" v-if="todo.length">
+        <ul>
+            <li v-for="item in items" v-bind:class="item.done ? 'done' : 'ing'">
+                <span class="label">{{item.label}}</span>
+                <div class="actions">
+                    <span v-if="item.done" v-on:click="deleteItem(item)">Delete</span>
+                    <span v-on:click="toggleItem(item)">{{ item.done ? 'Cancel' : 'Done' }}</span>
+                </div>
+            </li>
+        </ul>
     </div>
 
     <script>
+
         const list = new Vue({
-            el: '#list',
+            el: '#container',
             data: {
                 newItem: '',
-                sortByStatus: false,
+                sortByTime: true,    //按时间/状态排序
                 todo: [
                     {label: "Learn VueJs", done: true},
                     {label: "Code a todo list", done: false},
@@ -96,36 +159,36 @@
             methods: {
                 addItem: function () {
                     this.todo.push({label: this.newItem, done: false});
-                    alert(this.newItem);
                     this.newItem = '';
                 },
-                markAsDoneOrUndone: function (item) {
+                toggleItem: function (item) {
                     item.done = !item.done;
                 },
-                deleteItemFromList: function (item) {
+                deleteItem: function (item) {
                     let index = this.todo.indexOf(item);
                     this.todo.splice(index, 1);
                 },
                 toggle: function (active) {
-                    this.sortByStatus = active;
+                    this.sortByTime = active;
                 }
             },
             computed: {
-                todoByStatus: function () {
-                    if (!this.sortByStatus) {
+                items: function () {
+                    if (this.sortByTime) {
                         return this.todo;
+                    } else {
+                        let sortedArray = [];
+                        const doneArray = this.todo.filter(function (item) {
+                            return item.done;
+                        });
+                        const notDoneArray = this.todo.filter(function (item) {
+                            return !item.done;
+                        });
+
+                        sortedArray = [notDoneArray, doneArray];
+
+                        return sortedArray;
                     }
-
-                    let sortedArray = [];
-                    const doneArray = this.todo.filter(function (item) {
-                        return item.done;
-                    });
-                    const notDoneArray = this.todo.filter(function (item) {
-                        return !item.done;
-                    });
-
-                    sortedArray = [...notDoneArray, ...doneArray];
-                    return sortedArray;
                 }
             }
         });
