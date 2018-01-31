@@ -71,7 +71,7 @@
 
         .list li {
             display: flex;
-            margin: .5pc 0;
+            margin: .2pc 0;
             padding: 1pc .5pc 1pc 2pc;
             justify-content: space-between;
             background: rgba(255, 255, 255, 0.2);
@@ -128,7 +128,7 @@
 
     <form id="input" v-on:submit.prevent="addItem">
         <input type="text" placeholder="添加事项" v-model="newItem">
-        <button type="submit">Execute</button>
+        <button v-if="newItem" type="submit">Execute</button>
     </form>
 
     <div class="list" v-if="todo.length">
@@ -143,56 +143,64 @@
         </ul>
     </div>
 
-    <script>
-
-        const list = new Vue({
-            el: '#container',
-            data: {
-                newItem: '',
-                sortByTime: true,    //按时间/状态排序
-                todo: [
-                    {label: "Learn VueJs", done: true},
-                    {label: "Code a todo list", done: false},
-                    {label: "Learn something else", done: false}
-                ]
+</div>
+<script type="text/javascript" src="http://cdn.lifanko.cn/jquery-2.1.1.min.js"></script>
+<script>
+    const list = new Vue({
+        el: '#container',
+        data: {
+            newItem: '',
+            sortByTime: true,    //按时间/状态排序
+            todo: [
+                {label: "Learn VueJs", done: true, start: 0},
+                {label: "Code a todo list", done: false, start: 0}
+            ]
+        },
+        methods: {
+            network: function (option) {
+                $.get("http://localhost:63342/vue/server/note.php", function (data) {
+                    this.todo = eval("(" + data + ")");
+                    console.log(this.todo);
+                })
             },
-            methods: {
-                addItem: function () {
-                    this.todo.push({label: this.newItem, done: false});
-                    this.newItem = '';
-                },
-                toggleItem: function (item) {
-                    item.done = !item.done;
-                },
-                deleteItem: function (item) {
-                    let index = this.todo.indexOf(item);
-                    this.todo.splice(index, 1);
-                },
-                toggle: function (active) {
-                    this.sortByTime = active;
-                }
+            addItem: function () {
+                this.todo.push({label: this.newItem, done: false, start: 0});
+                this.newItem = '';
             },
-            computed: {
-                items: function () {
-                    if (this.sortByTime) {
-                        return this.todo;
-                    } else {
-                        let sortedArray = [];
-                        const doneArray = this.todo.filter(function (item) {
-                            return item.done;
-                        });
-                        const notDoneArray = this.todo.filter(function (item) {
-                            return !item.done;
-                        });
+            toggleItem: function (item) {
+                item.done = !item.done;
+            },
+            deleteItem: function (item) {
+                let index = this.todo.indexOf(item);
+                this.todo.splice(index, 1);
+            },
+            toggle: function (active) {
+                this.sortByTime = active;
+            }
+        },
+        computed: {
+            items: function () {
+                if (this.sortByTime) {
+                    return this.todo;
+                } else {
+                    let sortedArray = [];
+                    const doneArray = this.todo.filter(function (item) {
+                        return item.done;
+                    });
+                    const notDoneArray = this.todo.filter(function (item) {
+                        return !item.done;
+                    });
 
-                        sortedArray = [notDoneArray, doneArray];
+                    sortedArray = [notDoneArray, doneArray];
 
-                        return sortedArray;
-                    }
+                    return sortedArray;
                 }
             }
-        });
-    </script>
-</div>
+        }
+    });
+
+    list.network('getTodo');
+    console.log(list.todo)
+</script>
 </body>
 </html>
