@@ -16,20 +16,54 @@ try {   //创建pdo连接对象，全局使用
 }
 $pdo->query("set names utf8");
 
-$sql = "SELECT todo,status,start FROM $tableName WHERE name='lifanko'";
-
-$arrTodo = array();
-foreach ($pdo->query($sql) as $note) {
-    $buffer = [];
-    $buffer['label'] = $note['todo'];
-    $buffer['done'] = boolval($note['status']);
-    $buffer['start'] = $note['start'];
-    array_push($arrTodo, $buffer);
-}
-echo jsonKeyClear(json_encode($arrTodo));
-
 function jsonKeyClear($json)
 {  //去掉jsonKey的引号，适应js数据格式
     $json = preg_replace('/"(\w+)"(\s*:\s*)/is', '$1$2', $json);   //去掉key的双引号
     return $json;
+}
+
+$arrTodo = array();
+if (!empty($_GET['option'])) {
+    switch ($_GET['option']) {
+        case 'getodo':
+            $stmt = $pdo->prepare("SELECT id,todo,status,start FROM $tableName WHERE name = :name");
+            $stmt->execute(array('name' => 'lifanko'));
+
+            foreach ($stmt as $note) {
+                $buffer = [];
+                $buffer['id'] = $note['id'];
+                $buffer['label'] = $note['todo'];
+                $buffer['done'] = boolval($note['status']);
+                $buffer['start'] = $note['start'];
+                array_push($arrTodo, $buffer);
+            }
+            break;
+        case 'new':
+            $start = time();
+
+            $stmt = $pdo->prepare("INSERT INTO $tableName (name,todo,status,start) VALUES (:name, :todo, :status, :start)");
+            $stmt->execute(array('name' => 'lifanko', 'todo' => $_GET['item'], 'status' => 0, 'start' => $start));
+
+            $arrTodo['id'] = $pdo->lastInsertId();
+            $arrTodo['label'] = $_GET['item'];
+            $arrTodo['done'] = 0;
+            $arrTodo['start'] = $start;
+
+            break;
+        case 'done':
+            $stmt = $pdo->prepare("UPDATE $tableName SET status = :status WHERE ");
+            $arrTodo['result'] = $stmt->execute(array('status' => $_GET['status']));
+
+            break;
+        case 'del':
+            $arrTodo['result'] = 'delete';
+
+            break;
+        default:
+            $arrTodo['result'] = 'none';
+
+            break;
+    }
+
+    echo jsonKeyClear(json_encode($arrTodo));
 }
