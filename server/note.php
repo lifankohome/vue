@@ -26,7 +26,7 @@ $arrTodo = array();
 if (!empty($_GET['option'])) {
     switch ($_GET['option']) {
         case 'getodo':
-            $stmt = $pdo->prepare("SELECT id,todo,status,start FROM $tableName WHERE name = :name");
+            $stmt = $pdo->prepare("SELECT id,todo,status,start FROM $tableName WHERE name = :name AND status IN (0,1) ORDER BY id DESC");
             $stmt->execute(array('name' => 'lifanko'));
 
             foreach ($stmt as $note) {
@@ -51,12 +51,14 @@ if (!empty($_GET['option'])) {
 
             break;
         case 'done':
-            $stmt = $pdo->prepare("UPDATE $tableName SET status = :status WHERE ");
-            $arrTodo['result'] = $stmt->execute(array('status' => $_GET['status']));
+            $stmt = $pdo->prepare("UPDATE $tableName SET status = :status, end = :end WHERE id = :id");
+            $arrTodo['result'] = $stmt->execute(array('status' => intval($_GET['status']), 'end' => time(), 'id' => $_GET['id']));
 
             break;
         case 'del':
             $arrTodo['result'] = 'delete';
+            $stmt = $pdo->prepare("UPDATE $tableName SET status = :status WHERE id = :id");
+            $arrTodo['result'] = $stmt->execute(array('status' => $_GET['status'], 'id' => $_GET['id']));
 
             break;
         default:

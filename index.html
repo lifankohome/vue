@@ -134,10 +134,10 @@
     <div class="list" v-if="todo.length">
         <ul>
             <li v-for="item in items" v-bind:class="item.done ? 'done' : 'ing'">
-                <span class="label">{{item.label}}</span>
+                <span class="label">{{item.id}}、{{item.label}}</span>
                 <div class="actions">
                     <span v-if="item.done" v-on:click="deleteItem(item)">Delete</span>
-                    <span v-on:click="toggleItem(item)">{{ item.done ? 'Cancel' : 'Done' }}</span>
+                    <span v-if="!item.done" v-on:click="toggleItem(item)">{{ item.done ? 'Cancel' : 'Done' }}</span>
                 </div>
             </li>
         </ul>
@@ -146,6 +146,7 @@
 </div>
 <script type="text/javascript" src="http://cdn.lifanko.cn/jquery-2.1.1.min.js"></script>
 <script>
+    console.log('Vue Notebook v0.1(https://github.com/lifankohome/vue)');
     $.get("http://127.0.0.1/vue/server/note.php?option=getodo", function (data) {
         todoData = eval("(" + data + ")");
 
@@ -153,26 +154,34 @@
             el: '#container',
             data: {
                 newItem: '',
-                sortByTime: true,    //按时间/状态排序
+                sortByTime: true,    //Order by time or status
                 todo: todoData
             },
             methods: {
                 network: function (option) {
-                    $.get("http://127.0.0.1/vue/server/note.php?option="+option, function (data) {
-                        console.log(data)
+                    $.get("http://127.0.0.1/vue/server/note.php?option=" + option, function (data) {
+                        if(option.substring(0,3)==='new'){  //Add new note: Real Time Mode
+                            let res = eval("(" + data + ")");
+
+                            list.todo.unshift(res);   //Insert at list's head
+                        }
+
+                        return data;
                     });
                 },
                 addItem: function () {
-                    todoD = eval("(" + this.network('new&item=' + this.newItem) + ")");
-                    this.todo.push(todoD);
+                    this.network('new&item=' + this.newItem);
                 },
                 toggleItem: function (item) {
                     item.done = !item.done;
-                    this.network('done&status=' + item.done);
+
+                    let status = item.done ? 1 : 0;
+                    this.network('done&id=' + item.id + '&status=' + status);
                 },
                 deleteItem: function (item) {
                     let index = this.todo.indexOf(item);
                     this.todo.splice(index, 1);
+                    this.network('del&id=' + item.id + '&status=' + 2);
                 },
                 toggle: function (active) {
                     this.sortByTime = active;
