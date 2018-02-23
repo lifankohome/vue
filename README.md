@@ -19,7 +19,7 @@ CREATE TABLE `lifanko`.`note`
 `todo` VARCHAR(32) NOT NULL , 
 `status` TINYINT(1) NOT NULL DEFAULT 0 , 
 `start` VARCHAR(16) NOT NULL , 
-`end` VARCHAR(16) NOT NULL , 
+`end` VARCHAR(16) NOT NULL DEFAULT '' , 
 PRIMARY KEY (`id`))
-ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT = '网络笔记本';
+ENGINE = InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci COMMENT = 'vue-notebook';
 ```

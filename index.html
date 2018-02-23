@@ -3,7 +3,7 @@
       xmlns:v-if="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Note</title>
     <style>
         body {
             margin: 0;
@@ -147,7 +147,7 @@
 <script type="text/javascript" src="http://cdn.lifanko.cn/jquery-2.1.1.min.js"></script>
 <script>
     console.log('Vue Notebook v0.1(https://github.com/lifankohome/vue)');
-    $.get("http://127.0.0.1/vue/server/note.php?option=getodo", function (data) {
+    $.get("http://ali.lifanko.cn/note/server/note.php?option=getodo", function (data) {
         todoData = eval("(" + data + ")");
 
         const list = new Vue({
@@ -159,7 +159,7 @@
             },
             methods: {
                 network: function (option) {
-                    $.get("http://127.0.0.1/vue/server/note.php?option=" + option, function (data) {
+                    $.get("http://ali.lifanko.cn/note/server/note.php?option=" + option, function (data) {
                         if(option.substring(0,3)==='new'){  //Add new note: Real Time Mode
                             let res = eval("(" + data + ")");
 
