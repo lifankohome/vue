@@ -1,13 +1,23 @@
 # Vue
-Vue.js 网络记事本
+Vue.js Net Notebook
 
-###mysql
+### Features
+ + Note Real Time Add
+ + Input Auto Clear
+ + Anti SQL-Injection
+ + Order By DESC
+ + Task Period Calculate
+
+### Screenshot
+![Screenshots](https://github.com/lifankohome/vue/blob/master/Vue-screenshot.jpg?raw=true)
+
+### mysql
 ```
 CREATE TABLE `lifanko`.`note` 
 ( `id` INT NOT NULL AUTO_INCREMENT , 
 `name` VARCHAR(8) NOT NULL , 
 `todo` VARCHAR(32) NOT NULL , 
-`status` BOOLEAN NOT NULL DEFAULT TRUE , 
+`status` TINYINT NOT NULL DEFAULT 0 , 
 `start` VARCHAR(16) NOT NULL , 
 `end` VARCHAR(16) NOT NULL , 
 PRIMARY KEY (`id`))
