@@ -164,6 +164,8 @@
                             let res = eval("(" + data + ")");
 
                             list.todo.unshift(res);   //Insert at list's head
+
+                            list.newItem = '';  //Clear Input
                         }
 
                         return data;
